@@ -1,6 +1,8 @@
-package homework.one.task01;
+package homework.one;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class ArrayObject<T> {
 
@@ -12,9 +14,8 @@ public class ArrayObject<T> {
 
     @Override
     public String toString() {
-        return "ArrayObject{" +
-                "array=" + Arrays.toString(array) +
-                '}';
+        return "ArrayObject<" + array.getClass().getSimpleName() +
+                "> = " + Arrays.toString(array);
     }
 
     public void changePosition(int fstPosition, int sndPosition) {
@@ -23,4 +24,11 @@ public class ArrayObject<T> {
         array[fstPosition] = sndElement;
         array[sndPosition] = fstElement;
     }
+
+    public ArrayList<T> arrayToArrayList(){
+        ArrayList<T> arrayList = new ArrayList<>();
+        Collections.addAll(arrayList, array);
+        return arrayList;
+    }
+
 }
