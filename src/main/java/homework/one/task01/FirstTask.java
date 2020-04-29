@@ -27,23 +27,6 @@ public class FirstTask<T> {
         swapPosition(array, fstElement, sndElement);
         System.out.println(Arrays.toString(array));
         System.out.println();
-
-//        fstElement = 0;
-//        sndElement = 4;
-//
-//
-//        System.out.println(Arrays.toString(array));
-//        swapPosition(dblArray, fstElement, sndElement);
-//        System.out.println(Arrays.toString(dblArray));
-//        System.out.println();
-//
-//        fstElement = 2;
-//        sndElement = 3;
-//
-//        System.out.println(Arrays.toString(strArray));
-//        swapPosition(strArray, fstElement, sndElement);
-//        System.out.println(Arrays.toString(strArray));
-//        System.out.println();
     }
 
 }
