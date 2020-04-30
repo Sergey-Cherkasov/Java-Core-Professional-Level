@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="NetworkChat" uuid="a723ab8e-90a2-4d6a-9512-b0ea2bc3c8d3">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:D:\Geekbrains\Основной курс\Java Core. Professional level\Java-Core-Professional-Level\src\main\resources\NetworkChat.sqlite</jdbc-url>
+    </data-source>
+  </component>
+</project>

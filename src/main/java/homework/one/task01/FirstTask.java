@@ -2,17 +2,17 @@ package homework.one.task01;
 
 import java.util.Arrays;
 
-public class FirstTask<T> {
+public class FirstTask {
 
-    T[] array;
+    Object[] array;
 
-    public FirstTask(T[] array) {
+    public FirstTask(Object[] array) {
         this.array = array;
     }
 
-    public void swapPosition(T[] array, int fstPosition, int sndPosition) {
-        T fstElement = array[fstPosition];
-        T sndElement = array[sndPosition];
+    public void swapPosition(Object[] array, int fstPosition, int sndPosition) {
+        Object fstElement = array[fstPosition];
+        Object sndElement = array[sndPosition];
         array[fstPosition] = sndElement;
         array[sndPosition] = fstElement;
     }
