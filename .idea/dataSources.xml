@@ -7,5 +7,19 @@
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:D:\Geekbrains\Основной курс\Java Core. Professional level\Java-Core-Professional-Level\src\main\resources\NetworkChat.sqlite</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="networkchat" uuid="2d8cba8e-cc16-4175-b1bf-93aadb4771a2">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:D:\Geekbrains\Основной курс\Java Core. Professional level\Java-Core-Professional-Level\src\main\resources\networkchat.sqlite</jdbc-url>
+      <libraries>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.25.1/license.txt</url>
+        </library>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.25.1/sqlite-jdbc-3.25.1.jar</url>
+        </library>
+      </libraries>
+    </data-source>
   </component>
 </project>

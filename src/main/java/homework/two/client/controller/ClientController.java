@@ -3,6 +3,7 @@ package homework.two.client.controller;
 import homework.two.client.model.ClientService;
 import homework.two.client.view.AuthForm;
 import homework.two.client.view.ClientGUI;
+import homework.two.client.view.RegistrationForm;
 import homework.two.common.Command;
 
 import javax.swing.*;
@@ -15,12 +16,14 @@ public class ClientController {
    private static final String ALL_USERS_LIST_ITEM = "All";
    private static ClientService clientService;
    private final AuthForm authForm;
+   private final RegistrationForm registrationForm;
    private final ClientGUI clientGUI;
    private String userName;
 
    public ClientController(String serverHost, int serverPort) {
       clientService = ClientService.getClientService(serverHost, serverPort, this);
       this.authForm = new AuthForm(this);
+      this.registrationForm = new RegistrationForm(this);
       this.clientGUI = new ClientGUI(this);
    }
 
@@ -40,6 +43,11 @@ public class ClientController {
          ClientController.this.openChat();
       });
       authForm.setVisible(true);
+   }
+
+   public void runRegRequestProcess(){
+      authForm.dispose();
+      registrationForm.setVisible(true);
    }
 
    private void openChat() {
@@ -68,6 +76,10 @@ public class ClientController {
 
    public void sendAuthMessage(String login, String password) {
       sendCommand(Command.authCommand(login, password));
+   }
+
+   public void sendRegRequestMessage(){
+      sendCommand(Command.regRequestCommand());
    }
 
    private void sendCommand(Command command) {
@@ -101,4 +113,7 @@ public class ClientController {
       System.err.println(errorMessage);
    }
 
+   public void sendRegMessage(String firstName, String lastName, String nickName, String password) {
+      sendCommand(Command.regCommand(firstName, lastName, nickName, password));
+   }
 }

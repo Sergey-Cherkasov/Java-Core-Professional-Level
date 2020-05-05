@@ -99,20 +99,7 @@ public class ClientHandler {
     */
    private void authentication() throws IOException {
 
-      Thread timeOut = new Thread(() -> {
-         try {
-            Thread.sleep(30000);
-            String errorMessage = "Вышло время авторизации.\nПерезапустите приложение";
-            sendMessage(Command.errorCommand(errorMessage));
-            System.err.println(errorMessage);
-            closeConnection();
-         } catch (InterruptedException e) {
-            System.out.println("Авторизация успешна");
-         } catch (IOException e) {
-            e.printStackTrace();
-         }
-      }, "timeOut");
-      timeOut.start();
+      Thread timeOut = authTimeout();
 
       while (true) {
          Command command = readCommand();
@@ -121,17 +108,62 @@ public class ClientHandler {
             continue;
          }
 
-         if (command.getType() == CommandType.CMD_AUTH) {
-            if (processAuthCommand(command)) {
+         switch (command.getType()){
+            case CMD_AUTH:
+               if (processAuthCommand(command)) {
+                  timeOut.interrupt();
+                  return;
+               }
+            case CMD_REG_REQUEST:
                timeOut.interrupt();
-               return;
-            }
-         } else {
-            String errorMessage = "Illegal command for authentication: " + command.getType();
-            System.err.println(errorMessage);
-            sendMessage(Command.errorCommand(errorMessage));
+               sendMessage(command);
+               break;
+            case CMD_REG:
+               sendMessage(command);
+               break;
+            default:
+               String errorMessage = "Illegal command for authentication: " + command.getType();
+               System.err.println(errorMessage);
+               sendMessage(Command.errorCommand(errorMessage));
          }
+
+//         if (command.getType() == CommandType.CMD_AUTH) {
+//            if (processAuthCommand(command)) {
+//               timeOut.interrupt();
+//               return;
+//            }
+//         } else if (command.getType() == CommandType.CMD_REG_REQUEST){
+//            timeOut.interrupt();
+//            sendMessage(command);
+//         } else if (command.getType() == CommandType.CMD_REG){
+//
+//         } else {
+//            String errorMessage = "Illegal command for authentication: " + command.getType();
+//            System.err.println(errorMessage);
+//            sendMessage(Command.errorCommand(errorMessage));
+//         }
       }
+   }
+
+   /**
+    * Метод отслеживает время авторизации пользователя в чате
+    */
+   private Thread authTimeout() {
+      Thread timeOut = new Thread(() -> {
+         try {
+            Thread.sleep(30000);
+            String errorMessage = "Вышло время авторизации.\nПерезапустите приложение";
+            sendMessage(Command.errorCommand(errorMessage));
+            System.err.println(errorMessage);
+            closeConnection();
+         } catch (InterruptedException e) {
+            System.out.println("Поток timeOut успешно прерван");
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
+      }, "timeOut");
+      timeOut.start();
+      return timeOut;
    }
 
    private boolean processAuthCommand(Command command) throws IOException {

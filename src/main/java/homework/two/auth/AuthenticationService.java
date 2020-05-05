@@ -1,7 +1,7 @@
 package homework.two.auth;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import homework.two.db.handler.DBHandler;
+
 import java.sql.*;
 import java.util.Map;
 import java.util.Objects;
@@ -11,49 +11,21 @@ import java.util.Objects;
  */
 public class AuthenticationService implements AuthenticationServiceInterface{
 
-   private static final String NAME_CLASS = "org.sqlite.JDBC";
-   private static final String PROTOCOL = "jdbc";
-   private static final String SUB_PROTOCOL = "sqlite";
-   private static final String NAME_DB = "src/main/resources/NetworkChat.sqlite";
-
    private static final Map<DataUsers, String> USERNAME_BY_LOGIN_PASSWORD = Map.of(
            new DataUsers("Denials", "pass1"), "Denials",
            new DataUsers("Lawson", "pass2"), "Lawson",
            new DataUsers("McGregor", "pass3"), "McGregor"
    );
+   private Connection connection;
 
-   private Connection connectionDB;
-   private PreparedStatement preparedStatement;
-
-   /**
-    * Метод открывает соединение с БД
-    */
    @Override
    public void start() {
       System.out.println("Authentication service has been started");
-
-      try {
-         Class.forName(NAME_CLASS);
-         String urlDB = String.format("%s:%s:%s", PROTOCOL, SUB_PROTOCOL, NAME_DB);
-         connectionDB = DriverManager.getConnection(urlDB);
-         preparedStatement = connectionDB.prepareStatement("select name from users where nickname = ? and pwd = ?");
-      } catch (ClassNotFoundException | SQLException e) {
-         e.printStackTrace();
-      }
-
    }
 
-   /**
-    * Метод закрывает соединение с БД
-    */
    @Override
    public void stop() {
       System.out.println("Authentication service has been stopped");
-      try {
-         connectionDB.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
    }
 
    /**
@@ -64,18 +36,23 @@ public class AuthenticationService implements AuthenticationServiceInterface{
     */
    @Override
    public String getUserNameByLoginPassword(String login, String password) {
-      ResultSet resultSet;
-      String userName= "";
+      String userName= null;
       try {
-         preparedStatement.setString(1, login);
-         preparedStatement.setString(2, password);
-         resultSet = preparedStatement.executeQuery();
-         userName = resultSet.getString("name");
-      } catch (SQLException e) {
+         connection = DBHandler.getConnection();
+
+         /* Вызов методов для начальной настройки БД */
+         DBHandler.createTableUsers(connection);
+
+         ResultSet rs = DBHandler.authQuery(connection, login, password);
+         if (rs.next()){
+            userName = rs.getString("last_name");
+         }
+         System.err.println("User name = " + userName);
+         connection.close();
+      } catch (ClassNotFoundException | SQLException e) {
          e.printStackTrace();
       }
       return userName;
-//      return USERNAME_BY_LOGIN_PASSWORD.get(new DataUsers(login, password));
    }
 
    /**

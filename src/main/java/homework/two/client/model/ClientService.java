@@ -3,15 +3,14 @@ package homework.two.client.model;
 import homework.two.client.controller.AuthEvent;
 import homework.two.client.controller.ClientController;
 import homework.two.common.Command;
-import homework.two.common.commands.AuthCommand;
-import homework.two.common.commands.ErrorCommand;
-import homework.two.common.commands.MessageCommand;
-import homework.two.common.commands.UpdateUsersListCommand;
+import homework.two.common.commands.*;
+import homework.two.db.handler.DBHandler;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -87,10 +86,25 @@ public class ClientService {
             clientController.updateUsersList(users);
             break;
          }
+         case CMD_REG_REQUEST:
+            processRegRequestCommand();
+            break;
+         case CMD_REG:
+            processRegCommand(command);
+            break;
          default:
             System.err.println("Unknown type of command: " + command.getType());
       }
 
+   }
+
+   private void processRegCommand(Command command) {
+      RegCommand data = (RegCommand) command.getData();
+      try {
+         DBHandler.insertRecord(data.getFirstName(), data.getLastName(), data.getNickName(), data.getPassword());
+      } catch (SQLException | ClassNotFoundException e) {
+         e.printStackTrace();
+      }
    }
 
    private void processErrorCommand(Command command) {
@@ -114,6 +128,10 @@ public class ClientService {
       AuthCommand data = (AuthCommand) command.getData();
       String nickname = data.getUsername();
       successfulAuthEvent.authIsSuccessful(nickname);
+   }
+
+   private void processRegRequestCommand() {
+      clientController.runRegRequestProcess();
    }
 
    public void setMessageHandler(Consumer<String> messageHandler) {

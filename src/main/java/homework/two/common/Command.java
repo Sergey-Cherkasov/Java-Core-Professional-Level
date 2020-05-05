@@ -10,7 +10,14 @@ public class Command implements Serializable {
    private CommandType type;
    private Object data;
 
-   public Object getData() {
+   public static Command regCommand(String firstName, String lastName, String nickName, String password) {
+      Command command = new Command();
+      command.type = CommandType.CMD_REG;
+      command.data = new RegCommand(firstName, lastName, nickName, password);
+      return command;
+   }
+
+    public Object getData() {
       return data;
    }
 
@@ -23,6 +30,12 @@ public class Command implements Serializable {
       command.type = CommandType.CMD_AUTH;
       command.data = new AuthCommand(login, password);
       return command;
+   }
+
+   public static Command regRequestCommand() {
+       Command command = new Command();
+       command.type = CommandType.CMD_REG_REQUEST;
+       return command;
    }
 
    public static Command authErrorCommand(String errorMessage) {
