@@ -6,12 +6,14 @@ import homework.two.common.CommandType;
 import homework.two.common.commands.AuthCommand;
 import homework.two.common.commands.BroadcastMessageCommand;
 import homework.two.common.commands.PrivateMessageCommand;
+import homework.two.db.handler.DBHandler;
 import homework.two.server.models.Server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.SQLException;
 
 /**
  * Класс обработчика действий клиента
@@ -97,7 +99,7 @@ public class ClientHandler {
    /**
     * Метод аутентификации клиента
     */
-   private void authentication() throws IOException {
+   private void authentication() throws IOException, SQLException, ClassNotFoundException {
 
       Thread timeOut = authTimeout();
 
@@ -114,6 +116,7 @@ public class ClientHandler {
                   timeOut.interrupt();
                   return;
                }
+               break;
             case CMD_REG_REQUEST:
                timeOut.interrupt();
                sendMessage(command);
@@ -121,27 +124,14 @@ public class ClientHandler {
             case CMD_REG:
                sendMessage(command);
                break;
+            case CMD_END:
+               timeOut.interrupt();
+               return;
             default:
                String errorMessage = "Illegal command for authentication: " + command.getType();
                System.err.println(errorMessage);
                sendMessage(Command.errorCommand(errorMessage));
          }
-
-//         if (command.getType() == CommandType.CMD_AUTH) {
-//            if (processAuthCommand(command)) {
-//               timeOut.interrupt();
-//               return;
-//            }
-//         } else if (command.getType() == CommandType.CMD_REG_REQUEST){
-//            timeOut.interrupt();
-//            sendMessage(command);
-//         } else if (command.getType() == CommandType.CMD_REG){
-//
-//         } else {
-//            String errorMessage = "Illegal command for authentication: " + command.getType();
-//            System.err.println(errorMessage);
-//            sendMessage(Command.errorCommand(errorMessage));
-//         }
       }
    }
 
@@ -153,12 +143,13 @@ public class ClientHandler {
          try {
             Thread.sleep(30000);
             String errorMessage = "Вышло время авторизации.\nПерезапустите приложение";
+            DBHandler.insertRecordLog("Time for authorization has expired");
             sendMessage(Command.errorCommand(errorMessage));
             System.err.println(errorMessage);
             closeConnection();
          } catch (InterruptedException e) {
             System.out.println("Поток timeOut успешно прерван");
-         } catch (IOException e) {
+         } catch (IOException | ClassNotFoundException | SQLException e) {
             e.printStackTrace();
          }
       }, "timeOut");
@@ -166,19 +157,25 @@ public class ClientHandler {
       return timeOut;
    }
 
-   private boolean processAuthCommand(Command command) throws IOException {
+   private boolean processAuthCommand(Command command) throws IOException, SQLException, ClassNotFoundException {
       AuthCommand authCommand = (AuthCommand) command.getData();
       String login = authCommand.getLogin();
       String password = authCommand.getPassword();
       String nickname = authenticationServiceInterface.getUserNameByLoginPassword(login, password);
       if (nickname == null) {
-         sendMessage(Command.authErrorCommand("Неверные логин/пароль!"));
+         String textWrongLoginPassword = "Неверные логин/пароль!";
+         DBHandler.insertRecordLog(textWrongLoginPassword);
+         sendMessage(Command.authErrorCommand(textWrongLoginPassword));
       } else if (server.isUserNameBusy(nickname)) {
-         sendMessage(Command.authErrorCommand("Учетная запись уже используется!"));
+         String textAccountAlreadyUsed = "Учетная запись уже используется!";
+         DBHandler.insertRecordLog(textAccountAlreadyUsed);
+         sendMessage(Command.authErrorCommand(textAccountAlreadyUsed));
       } else {
+         String textSuccessfullyLoggedIn = "The user has successfully logged in";
          authCommand.setUsername(nickname);
          sendMessage(command);
          setName(nickname);
+         DBHandler.insertRecordLog(textSuccessfullyLoggedIn);
          server.broadcastMessage(Command.messageCommand(null, nickname + " Зашел в чат!"));
          server.subscribe(this);
          return true;
@@ -205,12 +202,13 @@ public class ClientHandler {
             readMessages();
          } catch (IOException e) {
             System.out.println("Connect has been failed.");
-            System.err.println(e.getMessage());
+//            System.err.println(e.getMessage());
+         } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
          } finally {
             closeConnection();
          }
       }).start();
-      //      this.name = "";
    }
 
    private void setName(String name) {

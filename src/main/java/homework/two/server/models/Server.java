@@ -3,11 +3,13 @@ package homework.two.server.models;
 import homework.two.auth.AuthenticationService;
 import homework.two.auth.AuthenticationServiceInterface;
 import homework.two.common.Command;
+import homework.two.db.handler.DBHandler;
 import homework.two.server.handlers.ClientHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,7 +59,9 @@ public class Server {
          while (true) {
             System.out.println("Сервер ожидает подключения клиента");
             Socket clientSocket = serverSocket.accept();
-            System.out.println("Клиент подключился");
+            String textClientConnected = "Клиент подключился";
+            DBHandler.insertRecordLog(textClientConnected);
+            System.out.println(textClientConnected);
             ClientHandler handler = new ClientHandler(this, clientSocket);
             try {
                handler.handle();
@@ -68,6 +72,8 @@ public class Server {
          }
       } catch (IOException e) {
          System.err.println(e.getMessage());
+         e.printStackTrace();
+      } catch (SQLException | ClassNotFoundException e) {
          e.printStackTrace();
       } finally {
          authenticationServiceInterface.stop();

@@ -62,6 +62,7 @@ public class AuthForm extends JFrame {
    }
 
    private void onExit() {
+      ClientController.shutdown();
       System.exit(0);
    }
 
@@ -77,6 +78,6 @@ public class AuthForm extends JFrame {
 
    public void showError(String errorMessage) {
        btnOk.setEnabled(false);
-       JOptionPane.showMessageDialog(this, errorMessage);
+       JOptionPane.showMessageDialog(this, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
    }
 }

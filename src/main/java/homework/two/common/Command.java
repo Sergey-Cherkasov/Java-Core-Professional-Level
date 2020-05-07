@@ -17,6 +17,13 @@ public class Command implements Serializable {
       return command;
    }
 
+   public static Command updateNicknameCommand(String firstName, String lastName, String newNickName) {
+      Command command = new Command();
+      command.type = CommandType.CMD_UPDATE_NICKNAME;
+      command.data = new UpdateNicknameCommand(firstName, lastName, newNickName);
+      return command;
+   }
+
     public Object getData() {
       return data;
    }

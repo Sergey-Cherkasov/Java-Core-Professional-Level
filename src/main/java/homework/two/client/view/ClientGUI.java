@@ -7,6 +7,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 
+import static javax.swing.JOptionPane.QUESTION_MESSAGE;
+
 public class ClientGUI extends JFrame {
    private JButton sendButton;
    private JPanel mainPanel;
@@ -14,6 +16,7 @@ public class ClientGUI extends JFrame {
    private JTextArea textArea;
    private JTextField inputText;
    private JPanel userListPanel;
+   private JButton btnChangeNickname;
 
    private final ClientController clientController;
 
@@ -30,12 +33,19 @@ public class ClientGUI extends JFrame {
       setLocationRelativeTo(null);
       sendButton.addActionListener(e -> ClientGUI.this.sendMessage());
       inputText.addActionListener(e -> sendMessage());
+      btnChangeNickname.addActionListener(e -> onChangeNickName());
       addWindowListener(new WindowAdapter() {
          public void windowClosing(WindowEvent e) {
             ClientController.shutdown();
          }
       });
       setContentPane(mainPanel);
+   }
+
+   private void onChangeNickName() {
+      String newNickName;
+      newNickName = JOptionPane.showInputDialog(this, "Укажите новый логин:", QUESTION_MESSAGE);
+      clientController.sendUpdateNickname(newNickName);
    }
 
    private void sendMessage() {

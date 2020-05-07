@@ -101,10 +101,11 @@ public class ClientService {
    private void processRegCommand(Command command) {
       RegCommand data = (RegCommand) command.getData();
       try {
-         DBHandler.insertRecord(data.getFirstName(), data.getLastName(), data.getNickName(), data.getPassword());
+         DBHandler.insertRecordUser(data.getFirstName(), data.getLastName(), data.getNickName(), data.getPassword());
       } catch (SQLException | ClassNotFoundException e) {
          e.printStackTrace();
       }
+      clientController.returnToAuth();
    }
 
    private void processErrorCommand(Command command) {
