@@ -10,17 +10,17 @@ public class Command implements Serializable {
    private CommandType type;
    private Object data;
 
-   public static Command regCommand(String firstName, String lastName, String nickName, String password) {
+   public static Command regCommand(String firstName, String lastName, String nickName, String login, String password) {
       Command command = new Command();
       command.type = CommandType.CMD_REG;
-      command.data = new RegCommand(firstName, lastName, nickName, password);
+      command.data = new RegCommand(firstName, lastName, nickName, login, password);
       return command;
    }
 
-   public static Command updateNicknameCommand(String firstName, String lastName, String newNickName) {
+   public static Command updateNicknameCommand(String nickname, String newNickname) {
       Command command = new Command();
       command.type = CommandType.CMD_UPDATE_NICKNAME;
-      command.data = new UpdateNicknameCommand(firstName, lastName, newNickName);
+      command.data = new UpdateNicknameCommand(nickname, newNickname);
       return command;
    }
 

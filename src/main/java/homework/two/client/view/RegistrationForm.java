@@ -15,6 +15,7 @@ public class RegistrationForm extends JFrame {
     private JPasswordField txtPassRepeat;
     private JButton btnRegister;
     private JButton btnCancel;
+    private JTextField txtLogin;
 
     private final ClientController clientController;
 
@@ -50,10 +51,11 @@ public class RegistrationForm extends JFrame {
         String firstName = txtFirstName.getText().trim();
         String lastName = txtLastName.getText().trim();
         String nickName = txtNickName.getText().trim();
+        String login = txtLogin.getText().trim();
         String password = new String(txtPassword.getPassword()).trim();
         String passRepeat = new String(txtPassRepeat.getPassword()).trim();
         if (password.equals(passRepeat)) {
-            clientController.sendRegMessage(firstName, lastName, nickName, password);
+            clientController.sendRegMessage(firstName, lastName, nickName, login, password);
         } else {
             showError("Password is not correct.");
         }

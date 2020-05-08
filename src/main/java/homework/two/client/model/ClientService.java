@@ -101,7 +101,8 @@ public class ClientService {
    private void processRegCommand(Command command) {
       RegCommand data = (RegCommand) command.getData();
       try {
-         DBHandler.insertRecordUser(data.getFirstName(), data.getLastName(), data.getNickName(), data.getPassword());
+         DBHandler.insertRecordUser(data.getFirstName(), data.getLastName(), data.getNickName(),
+                 data.getLogin(), data.getPassword());
       } catch (SQLException | ClassNotFoundException e) {
          e.printStackTrace();
       }
@@ -127,8 +128,9 @@ public class ClientService {
 
    private void processAuthCommand(Command command) {
       AuthCommand data = (AuthCommand) command.getData();
-      String nickname = data.getUsername();
-      successfulAuthEvent.authIsSuccessful(nickname);
+      String fullName = data.getFullname();
+      String nickname = data.getNickname();
+      successfulAuthEvent.authIsSuccessful(fullName, nickname);
    }
 
    private void processRegRequestCommand() {

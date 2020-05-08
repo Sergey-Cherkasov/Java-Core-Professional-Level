@@ -18,7 +18,9 @@ public class ClientController {
     private final AuthForm authForm;
     private final RegistrationForm registrationForm;
     private final ClientGUI clientGUI;
-    private String userName;
+
+    private String fullName;
+    private String nickname;
 
     public ClientController(String serverHost, int serverPort) {
         clientService = ClientService.getClientService(serverHost, serverPort, this);
@@ -38,8 +40,12 @@ public class ClientController {
     }
 
     private void runAuthProcess() {
-        clientService.setSuccessfulAuthEvent(nickname -> {
-            ClientController.this.setUserName(nickname);
+//        clientService.setSuccessfulAuthEvent(nickname -> {
+//            ClientController.this.setUserName(nickname);
+//            ClientController.this.openChat();
+//        });
+        clientService.setSuccessfulAuthEvent((fullName, nickname) -> {
+            ClientController.this.setUserNameOnTitle(fullName, nickname);
             ClientController.this.openChat();
         });
         authForm.setVisible(true);
@@ -56,13 +62,14 @@ public class ClientController {
         clientGUI.setVisible(true);
     }
 
-    private void setUserName(String userName) {
-        SwingUtilities.invokeLater(() -> clientGUI.setTitle(userName));
-        this.userName = userName;
+    private void setUserNameOnTitle(String fullName, String nickname) {
+        SwingUtilities.invokeLater(() -> clientGUI.setTitle(String.format("%s (%s)",nickname, fullName)));
+        this.fullName = fullName;
+        this.nickname = nickname;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getNickname() {
+        return nickname;
     }
 
     private void connectToServer() throws IOException {
@@ -99,7 +106,7 @@ public class ClientController {
     }
 
     public void updateUsersList(List<String> users) {
-        users.remove(userName);
+        users.remove(nickname);
         users.add(0, ALL_USERS_LIST_ITEM);
         clientGUI.updateUsers(users);
     }
@@ -113,8 +120,8 @@ public class ClientController {
         System.err.println(errorMessage);
     }
 
-    public void sendRegMessage(String firstName, String lastName, String nickName, String password) {
-        sendCommand(Command.regCommand(firstName, lastName, nickName, password));
+    public void sendRegMessage(String firstName, String lastName, String nickName, String login, String password) {
+        sendCommand(Command.regCommand(firstName, lastName, nickName, login, password));
     }
 
     public void returnToAuth() {
@@ -122,8 +129,11 @@ public class ClientController {
         authForm.setVisible(true);
     }
 
-    public void sendUpdateNickname(String newNickName) {
-        String[] splitUserName = getUserName().split("%s");
-        sendCommand(Command.updateNicknameCommand(splitUserName[0], splitUserName[1], newNickName));
+    public void sendUpdateNickname(String newNickname) {
+        String oldNickname = getNickname();
+        this.nickname = newNickname;
+        setUserNameOnTitle(fullName, nickname);
+        sendCommand(Command.updateNicknameCommand(oldNickname, newNickname));
+
     }
 }

@@ -7,7 +7,8 @@ public class AuthCommand implements Serializable {
    private final String login;
    private final String password;
 
-   private String username;
+   private String fullname;
+   private String nickname;
 
    public AuthCommand(String login, String password) {
       this.login = login;
@@ -22,12 +23,19 @@ public class AuthCommand implements Serializable {
       return password;
    }
 
-   public String getUsername() {
-      return username;
+   public String getNickname() {
+      return nickname;
    }
 
-   public void setUsername(String username) {
-      this.username = username;
+   public void setNickname(String nickname) {
+      this.nickname = nickname;
    }
 
+   public String getFullname() {
+      return fullname;
+   }
+
+   public void setFullname(String fullname) {
+      this.fullname = fullname;
+   }
 }

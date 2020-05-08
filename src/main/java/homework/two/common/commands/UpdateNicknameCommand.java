@@ -1,13 +1,21 @@
 package homework.two.common.commands;
 
-public class UpdateNicknameCommand {
-    private String firstName;
-    private String lastName;
-    private String newNickName;
+import java.io.Serializable;
 
-    public UpdateNicknameCommand(String firstName, String lastName, String newNickName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.newNickName = newNickName;
+public class UpdateNicknameCommand implements Serializable {
+    private final String nickname;
+    private final String newNickname;
+
+    public UpdateNicknameCommand(String nickname, String newNickname) {
+        this.nickname = nickname;
+        this.newNickname = newNickname;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public String getNewNickname() {
+        return newNickname;
     }
 }

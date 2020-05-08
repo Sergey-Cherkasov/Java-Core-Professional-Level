@@ -93,7 +93,7 @@ public class Server {
     */
    public boolean isUserNameBusy(String userName) {
       for (ClientHandler client : clients) {
-         if (client.getName().equals(userName)) {
+         if (client.getNickname().equals(userName)) {
             return true;
          }
       }
@@ -135,7 +135,7 @@ public class Server {
 
    public synchronized void sendPrivateMessage(String receiverUserName, Command command) throws IOException {
       for (ClientHandler client : clients) {
-         if (client.getName().equals(receiverUserName)) {
+         if (client.getNickname().equals(receiverUserName)) {
             client.sendMessage(command);
             return;
          }
@@ -143,7 +143,7 @@ public class Server {
    }
 
    private List<String> getAllUsernames() {
-      return clients.stream().map(ClientHandler::getName).collect(Collectors.toList());
+      return clients.stream().map(ClientHandler::getNickname).collect(Collectors.toList());
    }
 
 }

@@ -28,7 +28,7 @@ public class ClientGUI extends JFrame {
 
    private void initClientWindow() {
       setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-      setTitle(clientController.getUserName());
+      setTitle(clientController.getNickname());
       setSize(500, 500);
       setLocationRelativeTo(null);
       sendButton.addActionListener(e -> ClientGUI.this.sendMessage());
@@ -44,7 +44,7 @@ public class ClientGUI extends JFrame {
 
    private void onChangeNickName() {
       String newNickName;
-      newNickName = JOptionPane.showInputDialog(this, "Укажите новый логин:", QUESTION_MESSAGE);
+      newNickName = JOptionPane.showInputDialog(this, "Enter a new nickname:", QUESTION_MESSAGE);
       clientController.sendUpdateNickname(newNickName);
    }
 

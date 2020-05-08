@@ -36,10 +36,14 @@ public class AuthenticationService implements AuthenticationServiceInterface {
      * @return имя пользователя, либо null.
      */
     @Override
-    public String getUserNameByLoginPassword(String login, String password) {
-        String userName = null;
+    public String[] getUserNameByLoginPassword(String login, String password) {
+        String[] authQueryResult = new String[0];
+//        String fullName = null;
+//        String nickname = null;
         try {
-            userName = DBHandler.authQuery(login, password);
+            authQueryResult = DBHandler.authQuery(login, password);
+//            fullName = authQueryResult[0];
+//            nickname = authQueryResult[1];
         } catch (SQLException e) {
             System.err.println("SQL query execution error: " + e.getMessage());
             e.printStackTrace();
@@ -47,8 +51,8 @@ public class AuthenticationService implements AuthenticationServiceInterface {
             System.err.println("Error accessing the database driver: " + e.getMessage());
             e.printStackTrace();
         }
-        System.err.println("User name = " + userName);
-        return userName;
+//        System.err.println("User name = " + nickname);
+        return authQueryResult;
     }
 
     /**

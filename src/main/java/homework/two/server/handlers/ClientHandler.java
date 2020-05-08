@@ -2,10 +2,10 @@ package homework.two.server.handlers;
 
 import homework.two.auth.AuthenticationServiceInterface;
 import homework.two.common.Command;
-import homework.two.common.CommandType;
 import homework.two.common.commands.AuthCommand;
 import homework.two.common.commands.BroadcastMessageCommand;
 import homework.two.common.commands.PrivateMessageCommand;
+import homework.two.common.commands.UpdateNicknameCommand;
 import homework.two.db.handler.DBHandler;
 import homework.two.server.models.Server;
 
@@ -24,7 +24,8 @@ public class ClientHandler {
    private ObjectInputStream inputStream;
    private ObjectOutputStream outputStream;
 
-   private String name;
+   private String fullName;
+   private String nickname;
 
    private final AuthenticationServiceInterface authenticationServiceInterface;
 
@@ -47,7 +48,7 @@ public class ClientHandler {
    private void closeConnection() {
       try {
          server.unsubscribe(this);
-         server.broadcastMessage(Command.broadcastMessageCommand(name + " вышел из чата"));
+         server.broadcastMessage(Command.broadcastMessageCommand(nickname + " вышел из чата"));
          socket.close();
       } catch (IOException e) {
          System.err.println(e.getMessage());
@@ -57,7 +58,7 @@ public class ClientHandler {
    /**
     * Метод осуществляет чтение сообщений, полученных от сервера
     */
-   private void readMessages() throws IOException {
+   private void readMessages() throws IOException, SQLException, ClassNotFoundException {
       while (true) {
          Command command = readCommand();
          if (command == null) {
@@ -68,13 +69,16 @@ public class ClientHandler {
                return;
             case CMD_BROADCAST_MESSAGE:
                BroadcastMessageCommand data = (BroadcastMessageCommand) command.getData();
-               server.broadcastMessage(Command.messageCommand(name, data.getMessage()));
+               server.broadcastMessage(Command.messageCommand(nickname, data.getMessage()));
                break;
             case CMD_PRIVATE_MESSAGE:
                PrivateMessageCommand privateMessageCommand = (PrivateMessageCommand) command.getData();
                String receiver = privateMessageCommand.getReceiver();
                String message = privateMessageCommand.getMessage();
-               server.sendPrivateMessage(receiver, Command.messageCommand(name, message));
+               server.sendPrivateMessage(receiver, Command.messageCommand(nickname, message));
+               break;
+            case CMD_UPDATE_NICKNAME:
+               updateNickname(command);
                break;
             default:
                String errorMessage = "Unknown type of command : " + command.getType();
@@ -105,11 +109,9 @@ public class ClientHandler {
 
       while (true) {
          Command command = readCommand();
-
          if (command == null) {
             continue;
          }
-
          switch (command.getType()){
             case CMD_AUTH:
                if (processAuthCommand(command)) {
@@ -161,7 +163,9 @@ public class ClientHandler {
       AuthCommand authCommand = (AuthCommand) command.getData();
       String login = authCommand.getLogin();
       String password = authCommand.getPassword();
-      String nickname = authenticationServiceInterface.getUserNameByLoginPassword(login, password);
+      String[] authQueryResult = authenticationServiceInterface.getUserNameByLoginPassword(login, password);
+      String fullName = authQueryResult[0];
+      String nickname = authQueryResult[1];
       if (nickname == null) {
          String textWrongLoginPassword = "Неверные логин/пароль!";
          DBHandler.insertRecordLog(textWrongLoginPassword);
@@ -172,9 +176,11 @@ public class ClientHandler {
          sendMessage(Command.authErrorCommand(textAccountAlreadyUsed));
       } else {
          String textSuccessfullyLoggedIn = "The user has successfully logged in";
-         authCommand.setUsername(nickname);
+         authCommand.setFullname(fullName);
+         authCommand.setNickname(nickname);
          sendMessage(command);
-         setName(nickname);
+         setFullName(fullName);
+         setNickname(nickname);
          DBHandler.insertRecordLog(textSuccessfullyLoggedIn);
          server.broadcastMessage(Command.messageCommand(null, nickname + " Зашел в чат!"));
          server.subscribe(this);
@@ -202,7 +208,6 @@ public class ClientHandler {
             readMessages();
          } catch (IOException e) {
             System.out.println("Connect has been failed.");
-//            System.err.println(e.getMessage());
          } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
          } finally {
@@ -211,12 +216,29 @@ public class ClientHandler {
       }).start();
    }
 
-   private void setName(String name) {
-      this.name = name;
+   private void setNickname(String nickname) {
+      this.nickname = nickname;
    }
 
-   public String getName() {
-      return name;
+   public String getNickname() {
+      return nickname;
    }
 
+   public void setFullName(String fullName) {
+      this.fullName = fullName;
+   }
+
+   public String getFullName() {
+      return fullName;
+   }
+
+   private void updateNickname(Command command) throws SQLException, ClassNotFoundException, IOException {
+      server.unsubscribe(this);
+      UpdateNicknameCommand data = (UpdateNicknameCommand) command.getData();
+      String nickname = data.getNickname();
+      String newNickname = data.getNewNickname();
+      DBHandler.changeNickname(nickname, newNickname);
+      setNickname(newNickname);
+      server.subscribe(this);
+   }
 }

@@ -25,7 +25,7 @@ public class ServerApplication {
 //         DBHandler.deleteTableUsers();
          DBHandler.createTableUsers();
 
-         DBHandler.deleteTableLogs();
+//         DBHandler.deleteTableLogs();
          DBHandler.createTableLogs();
       } catch (SQLException | ClassNotFoundException e) {
          System.err.println("Error of creating database: " + e.getMessage());
