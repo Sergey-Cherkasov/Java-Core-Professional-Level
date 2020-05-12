@@ -12,8 +12,8 @@ public class Main {
         Double[] dblArray = {1.0, 2.0, 3.0, 4.0, 5.0};
         String[] strArray = {"One", "Two", "Three", "Four", "Five"};
 
-//        FirstTask<Integer> fstTask = new FirstTask<>(intArray);
-        FirstTask<String> fstTask = new FirstTask<>(strArray);
+//        FirstTask fstTask = new FirstTask(intArray);
+        FirstTask fstTask = new FirstTask(strArray);
         SecondTask<Double> sndTask = new SecondTask<>(dblArray);
 //        SecondTask<String> sndTask = new SecondTask<>(strArray);
         ThirdTask thdTask = new ThirdTask();
