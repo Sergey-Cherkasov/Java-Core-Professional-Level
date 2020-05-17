@@ -14,8 +14,8 @@ public class Book implements Serializable {
         this.author = author;
     }
 
-    public String getInfo(){
-        return String.format("Книга: %sб автор: %s", name, author);
+    public String getInfo() {
+        return String.format("Книга: %s, автор: %s", name, author);
     }
 
 }
