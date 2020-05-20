@@ -45,34 +45,22 @@ public class Car implements Runnable {
 
         try {
             cb.await();
-        } catch (InterruptedException | BrokenBarrierException e) {
-            e.printStackTrace();
-        }
-
-        for (int i = 0; i < race.getStages().size(); i++) {
-            if (race.getStages().get(i) instanceof Tunnel) {
-                try {
+            for (int i = 0; i < race.getStages().size(); i++) {
+                if (race.getStages().get(i) instanceof Tunnel) {
                     semaphore.acquire();
                     race.getStages().get(i).go(this);
                     semaphore.release();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } else {
+                    race.getStages().get(i).go(this);
                 }
-            } else {
-                race.getStages().get(i).go(this);
             }
-        }
-
-        if (win_count.incrementAndGet() == 1) {
-            System.out.println(this.name + " - WIN");
-        }
-
-        try {
+            if (win_count.incrementAndGet() == 1) {
+                System.out.println(this.name + " - WIN");
+            }
             cb.await();
         } catch (InterruptedException | BrokenBarrierException e) {
             e.printStackTrace();
         }
-
     }
 
 }
