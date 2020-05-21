@@ -11,7 +11,6 @@ public class Car implements Runnable {
     private final Race race;
     private final int speed;
     private final CyclicBarrier cb;
-    private final Semaphore semaphore;
     private final String name;
 
     static AtomicInteger win_count = new AtomicInteger();
@@ -24,11 +23,10 @@ public class Car implements Runnable {
         return speed;
     }
 
-    public Car(Race race, int speed, CyclicBarrier cb, Semaphore semaphore) {
+    public Car(Race race, int speed, CyclicBarrier cb) {
         this.race = race;
         this.speed = speed;
         this.cb = cb;
-        this.semaphore = semaphore;
         CARS_COUNT++;
         this.name = "Участник #" + CARS_COUNT;
     }
@@ -47,9 +45,7 @@ public class Car implements Runnable {
             cb.await();
             for (int i = 0; i < race.getStages().size(); i++) {
                 if (race.getStages().get(i) instanceof Tunnel) {
-                    semaphore.acquire();
                     race.getStages().get(i).go(this);
-                    semaphore.release();
                 } else {
                     race.getStages().get(i).go(this);
                 }
