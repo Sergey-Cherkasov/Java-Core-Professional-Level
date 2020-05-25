@@ -8,6 +8,7 @@ import homework.two.common.commands.PrivateMessageCommand;
 import homework.two.common.commands.UpdateNicknameCommand;
 import homework.two.db.handler.DBHandler;
 import homework.two.server.models.Server;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -29,6 +30,8 @@ public class ClientHandler {
 
    private final AuthenticationServiceInterface authenticationServiceInterface;
 
+   private final Logger logger;
+
    /**
     * Конструктор обработчика действий клиента запускает аутентификацию и метод чтения сообщений
     * в отдельном потоке.
@@ -40,6 +43,7 @@ public class ClientHandler {
       this.server = server;
       this.socket = socket;
       this.authenticationServiceInterface = server.getAuthenticationServiceInterface();
+      this.logger = Logger.getLogger(homework.two.server.handlers.ClientHandler.class);
    }
 
    /**
@@ -48,6 +52,7 @@ public class ClientHandler {
    private void closeConnection() {
       try {
          server.unsubscribe(this);
+         logger.info(nickname + " quit from chat");
          server.broadcastMessage(Command.broadcastMessageCommand(nickname + " вышел из чата"));
          socket.close();
       } catch (IOException e) {
@@ -81,6 +86,7 @@ public class ClientHandler {
                updateNickname(command);
                break;
             default:
+               logger.fatal("Unknown type of command : " + command.getType());
                String errorMessage = "Unknown type of command : " + command.getType();
                System.err.println(errorMessage);
                sendMessage(Command.errorCommand(errorMessage));
@@ -92,6 +98,7 @@ public class ClientHandler {
       try {
          return (Command) inputStream.readObject();
       } catch (ClassNotFoundException e) {
+         logger.warn("Unknown type of object from client!");
          String errorMessage = "Unknown type of object from client!";
          System.err.println(errorMessage);
          e.printStackTrace();
@@ -130,6 +137,7 @@ public class ClientHandler {
                timeOut.interrupt();
                return;
             default:
+               logger.fatal("Illegal command for authentication: " + command.getType());
                String errorMessage = "Illegal command for authentication: " + command.getType();
                System.err.println(errorMessage);
                sendMessage(Command.errorCommand(errorMessage));
@@ -146,11 +154,13 @@ public class ClientHandler {
             Thread.sleep(30000);
             String errorMessage = "Вышло время авторизации.\nПерезапустите приложение";
             DBHandler.insertRecordLog("Time for authorization has expired");
+            logger.info("Time for authorization has expired");
             sendMessage(Command.errorCommand(errorMessage));
             System.err.println(errorMessage);
             closeConnection();
          } catch (InterruptedException e) {
             System.out.println("Поток timeOut успешно прерван");
+            logger.info("Поток timeOut успешно прерван");
          } catch (IOException | ClassNotFoundException | SQLException e) {
             e.printStackTrace();
          }
@@ -170,8 +180,10 @@ public class ClientHandler {
          String textWrongLoginPassword = "Неверные логин/пароль!";
          DBHandler.insertRecordLog(textWrongLoginPassword);
          sendMessage(Command.authErrorCommand(textWrongLoginPassword));
+         logger.info(textWrongLoginPassword);
       } else if (server.isUserNameBusy(nickname)) {
          String textAccountAlreadyUsed = "Учетная запись уже используется!";
+         logger.info(textAccountAlreadyUsed);
          DBHandler.insertRecordLog(textAccountAlreadyUsed);
          sendMessage(Command.authErrorCommand(textAccountAlreadyUsed));
       } else {
@@ -182,6 +194,7 @@ public class ClientHandler {
          setFullName(fullName);
          setNickname(nickname);
          DBHandler.insertRecordLog(textSuccessfullyLoggedIn);
+         logger.info(textSuccessfullyLoggedIn);
          server.broadcastMessage(Command.messageCommand(null, nickname + " Зашел в чат!"));
          server.subscribe(this);
          return true;
@@ -208,6 +221,7 @@ public class ClientHandler {
             readMessages();
          } catch (IOException e) {
             System.out.println("Connect has been failed.");
+            logger.fatal("Connect has been failed.");
          } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
          } finally {

@@ -1,0 +1,14 @@
+2020-05-22 22:41:54 INFO   admin:62 - Сервер ожидает подключения клиента
+2020-05-22 22:42:00 INFO   admin:65 - Клиент подключился
+2020-05-22 22:42:00 INFO   admin:62 - Сервер ожидает подключения клиента
+2020-05-22 22:42:19 INFO   ClientHandler:183 - Неверные логин/пароль!
+2020-05-22 22:42:28 INFO   ClientHandler:183 - Неверные логин/пароль!
+2020-05-22 22:42:30 INFO   ClientHandler:157 - Time for authorization has expired
+2020-05-22 22:42:30 INFO   ClientHandler:55 - null quit from chat
+2020-05-22 22:42:30 FATAL  ClientHandler:224 - Connect has been failed.
+2020-05-22 22:42:30 INFO   ClientHandler:55 - null quit from chat
+2020-05-22 22:42:40 INFO   admin:65 - Клиент подключился
+2020-05-22 22:42:40 INFO   admin:62 - Сервер ожидает подключения клиента
+2020-05-22 22:42:47 INFO   ClientHandler:197 - The user has successfully logged in
+2020-05-22 22:42:47 INFO   ClientHandler:163 - Поток timeOut успешно прерван
+2020-05-22 22:42:51 INFO   ClientHandler:55 - mr. Denials quit from chat

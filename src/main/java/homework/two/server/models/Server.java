@@ -5,6 +5,7 @@ import homework.two.auth.AuthenticationServiceInterface;
 import homework.two.common.Command;
 import homework.two.db.handler.DBHandler;
 import homework.two.server.handlers.ClientHandler;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -24,7 +25,6 @@ public class Server {
    private final int port;
    private final AuthenticationServiceInterface authenticationServiceInterface;
    private final List<ClientHandler> clients;
-
 
    private Server() {
       this.port = 82_83;
@@ -54,12 +54,15 @@ public class Server {
     * При подключении клиента создает экземпляр обработчика действий клиента.
     */
    public void initConnection() {
+      Logger logger = Logger.getLogger("admin");
       try (ServerSocket serverSocket = new ServerSocket(port)) {
          authenticationServiceInterface.start();
          while (true) {
             System.out.println("Сервер ожидает подключения клиента");
+            logger.info("Сервер ожидает подключения клиента");
             Socket clientSocket = serverSocket.accept();
             String textClientConnected = "Клиент подключился";
+            logger.info("Клиент подключился");
             DBHandler.insertRecordLog(textClientConnected);
             System.out.println(textClientConnected);
             ClientHandler handler = new ClientHandler(this, clientSocket);
@@ -67,6 +70,7 @@ public class Server {
                handler.handle();
             } catch (IOException e) {
                System.err.println("Failed to handle client connection");
+               logger.fatal("Failed to handle client connection");
                clientSocket.close();
             }
          }
