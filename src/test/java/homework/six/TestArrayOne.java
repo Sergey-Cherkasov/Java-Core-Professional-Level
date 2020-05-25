@@ -60,7 +60,7 @@ public class TestArrayOne {
     }
 
     private final int[] arrExp;
-    private final int[] arrReq
+    private final int[] arrReq;
 
     public TestArrayOne(int[] arrReq, int[] arrExp) {
         this.arrExp = arrExp;

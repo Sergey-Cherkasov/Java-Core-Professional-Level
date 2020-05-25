@@ -17,4 +17,19 @@ public class HWArrays {
         return resultArray;
     }
 
+    public Boolean hasOneOrFourIntoArray(int[] array){
+        for (int value : array) {
+            if (value != 1 && value != 4) {
+                return false;
+            }
+        }
+        int count = 0;
+        for (int value : array) {
+            if (value == 1) {
+                count++;
+            }
+        }
+        return count != 0 && count != array.length;
+    }
+
 }
